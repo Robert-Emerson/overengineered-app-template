@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      context: ../src/Api
+      target: development
+    ports:
+      - "8080:8080"
+    develop:
+      watch:
+        - action: rebuild
+          path: ../src/Api
+    environment:
+       - ASPNETCORE_ENVIRONMENT=Development
