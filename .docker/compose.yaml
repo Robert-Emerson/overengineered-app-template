@@ -1,17 +1,36 @@
 services:
-  api:
+  todo-api:
     build:
-      context: ../src/Api
+      context: ../src/Todo
       target: development
-    ports:
-      - "8080:8080"
     develop:
       watch:
         - action: rebuild
-          path: ../src/Api
+          path: ../src/Todo
     environment:
        - ASPNETCORE_ENVIRONMENT=Development
     healthcheck:
-      test: wget http://localhost:8080/health || exit 1
+      test: wget http://localhost:8080/todos/health || exit 1
       timeout: 3s
-      start_period: 3s
+      start_period: 15s
+
+  ingress-proxy:
+    build:
+      context: ../infrastructure/envoy/
+    depends_on:
+      todo-proxy:
+        condition: service_healthy
+    ports:
+    - "${PORT_PROXY:-8080}:8080"
+    - "${PORT_STATS:-8001}:8001"
+
+  todo-proxy:
+    build:
+      context: ../infrastructure/envoy/
+      target: envoy-admin
+      args:
+        ENVOY_CONFIG: ./todo-proxy.yaml
+        ENVOY_ADMIN_PORT: 8001
+    depends_on:
+      todo-api:
+        condition: service_healthy

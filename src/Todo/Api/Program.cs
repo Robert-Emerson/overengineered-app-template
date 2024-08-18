@@ -27,9 +27,9 @@ var sampleTodos = new Todo[] {
     new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
 };
 
-app.MapHealthChecks("/health");
-
 var todosApi = app.MapGroup("/todos");
+
+todosApi.MapHealthChecks("/health");
 todosApi.MapGet("/", () => sampleTodos);
 todosApi.MapGet("/{id}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
