@@ -11,3 +11,7 @@ services:
           path: ../src/Api
     environment:
        - ASPNETCORE_ENVIRONMENT=Development
+    healthcheck:
+      test: wget http://localhost:8080/health || exit 1
+      timeout: 3s
+      start_period: 3s

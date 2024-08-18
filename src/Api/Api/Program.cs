@@ -1,14 +1,21 @@
-using Api;
-using Domain.Entity;
+using App.Api;
+using App.Domain.Entity;
 
-using System.Text.Json.Serialization;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
-});
+builder.Services
+    .ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+        })
+    .AddHealthChecks();
+
+builder.Services.AddOpenTelemetry()
+        .WithTracing(builder => builder
+            .AddAspNetCoreInstrumentation()
+            .AddConsoleExporter());
 
 var app = builder.Build();
 
@@ -19,6 +26,8 @@ var sampleTodos = new Todo[] {
     new(4, "Clean the bathroom"),
     new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
 };
+
+app.MapHealthChecks("/health");
 
 var todosApi = app.MapGroup("/todos");
 todosApi.MapGet("/", () => sampleTodos);
