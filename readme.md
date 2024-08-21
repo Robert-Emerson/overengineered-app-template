@@ -1,6 +1,6 @@
-# Title
+# Description
 
-Template for a modern, over-engineered web app that uses containers and service mesh for no reason other than because it can
+Template for a modern, over-engineered web app that uses containers and service mesh for no reason other than because it can (and because I want to get a bit more experience with 'em)
 
 ## Dependencies
 
@@ -10,9 +10,9 @@ Template for a modern, over-engineered web app that uses containers and service 
 
 ## Running
 
-`make api` - runs the API
-`make watch` - runs the API and watches for file changes
-`make clean` - cleans up docker containers
+- `make api` - runs the API
+- `make watch` - runs the API and watches for file changes
+- `make clean` - cleans up docker containers
 
 ## Contributing
 
@@ -25,8 +25,8 @@ Template for a modern, over-engineered web app that uses containers and service 
    2. Cert generation
    3. Envoy JWT validation
    4. API JWT validation
-2. mTLS for ingress -> sidecar-proxy
-3. Parameterize `todo-proxy.yaml`
+2. mTLS for ingress -> todo-proxy
+3. Parameterize `todo-proxy.yaml` > 'api-proxy.yaml'
 4. Logging
    1. OTel in API
    2. Apache Skywalking? or maybe Jaeger/Prometheus/Grafana
