@@ -31,7 +31,7 @@ var todosApi = app.MapGroup("/todos");
 
 todosApi.MapHealthChecks("/health");
 todosApi.MapGet("/", () => sampleTodos);
-todosApi.MapGet("/{id}", (int id) =>
+todosApi.MapGet("/{id:int}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)
         : Results.NotFound());
