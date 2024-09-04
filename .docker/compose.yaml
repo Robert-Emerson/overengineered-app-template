@@ -19,6 +19,8 @@ services:
   ingress-proxy:
     build:
       context: ../infrastructure/envoy/
+      args:
+        ENVOY_ADMIN_PORT: 8001
     depends_on:
       todo-proxy:
         condition: service_healthy
