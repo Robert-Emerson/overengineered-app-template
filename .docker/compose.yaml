@@ -1,5 +1,14 @@
 name: microservice-chassis
 
+secrets:
+  kc_db_password:
+    environment: "KC_DB_PASSWORD"
+  db_root_password:
+    environment: "DB_ROOT_PASSWORD"
+
+volumes:
+  pgdata:
+
 services:
   todo-api:
     build:
@@ -16,17 +25,38 @@ services:
       timeout: 3s
       start_period: 15s
 
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    build:
+      context: ../infrastructure/db/
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password
+      KC_DB_PASSWORD: /run/secrets/kc_db_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ../infrastructure/db/init:/docker-entrypoint-initdb.d/
+      - pgdata:/var/lib/postgresql/data 
+    secrets:
+      - db_root_password
+      - kc_db_password
+    ports:
+      - "5432:5432"
+
   ingress-proxy:
     build:
       context: ../infrastructure/envoy/
-      args:
-        ENVOY_ADMIN_PORT: 8001
     depends_on:
       todo-proxy:
         condition: service_healthy
     ports:
-    - "${PORT_PROXY:-8080}:8080"
-    - "${PORT_STATS:-8001}:8001"
+    - "8080:8080"
+    - "8001:8001"
 
   todo-proxy:
     build:
@@ -34,7 +64,6 @@ services:
       target: envoy-admin
       args:
         ENVOY_CONFIG: ./todo-proxy.yaml
-        ENVOY_ADMIN_PORT: 8001
     depends_on:
       todo-api:
         condition: service_healthy
