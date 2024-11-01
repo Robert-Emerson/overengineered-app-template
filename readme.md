@@ -12,7 +12,8 @@ Template for a modern, over-engineered web app that uses containers and service 
 
 - `make api` - runs the API
 - `make watch` - runs the API and watches for file changes
-- `make clean` - cleans up docker containers
+- `make down` - stops running containers; removes containers
+- `make clean` - stops running containers; removes containers; deletes custom images
 
 ## Contributing
 

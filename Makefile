@@ -8,5 +8,8 @@ build-todo:
 	dotnet clean src/Todo/Api/Api.csproj
 	dotnet build src/Todo/Api/Api.csproj
 
-clean:
+down:
 	docker-compose --file .docker/compose.yaml down
+
+clean:
+	docker-compose --file .docker/compose.yaml down --rmi local

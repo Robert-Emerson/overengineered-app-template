@@ -1,5 +1,5 @@
-ARG ENVOY_IMAGE=envoyproxy/envoy
-ARG ENVOY_VARIANT=dev
+ARG ENVOY_IMAGE="${ENVOY_IMAGE:-envoyproxy/envoy}"
+ARG ENVOY_VARIANT="${ENVOY_VARIANT:-dev}"
 
 FROM ${ENVOY_IMAGE}:${ENVOY_VARIANT} AS envoy-base
 ARG ENVOY_CONFIG=envoy.yaml

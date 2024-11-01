@@ -1,6 +1,8 @@
 name: microservice-chassis
 
 secrets:
+  kc_db_login:
+    environment: "KC_DB_LOGIN"
   kc_db_password:
     environment: "KC_DB_PASSWORD"
   db_root_password:
@@ -19,13 +21,13 @@ services:
         - action: rebuild
           path: ../src/Todo
     environment:
-       - ASPNETCORE_ENVIRONMENT=Development
+      ASPNETCORE_ENVIRONMENT: Development
     healthcheck:
       test: wget -O/dev/null http://localhost:8080/todos/health || exit 1
       timeout: 3s
       start_period: 15s
 
-  db:
+  auth-db:
     image: postgres
     restart: always
     user: postgres
@@ -33,6 +35,7 @@ services:
       context: ../infrastructure/db/
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/db_root_password
+      KC_DB_LOGIN: /run/secrets/kc_db_login
       KC_DB_PASSWORD: /run/secrets/kc_db_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready"]
@@ -44,19 +47,50 @@ services:
       - pgdata:/var/lib/postgresql/data 
     secrets:
       - db_root_password
+      - kc_db_login
       - kc_db_password
+
+  auth:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KC_HEALTH_ENABLED: true
+      KC_METRICS_ENABLED: true
+      KC_HOSTNAME: auth.localhost
+      KC_HOSTNAME_PORT: 9090
+      DB_VENDOR: postgres
+      DB_ADDR: auth-db
+      DB_DATABASE: keycloak
+      DB_USER: ${KC_DB_LOGIN}
+      DB_PASSWORD: ${KC_DB_PASSWORD}
+      DB_SCHEMA: keycloak
+      KEYCLOAK_ADMIN: ${KC_ADMIN_LOGIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KEYCLOAK_USER: ${KC_USER_LOGIN}
+      KEYCLOAK_PASSWORD: ${KC_USER_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://auth-db/keycloak
+      KC_DB_USERNAME: ${KC_DB_LOGIN}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - 9090:8080
+      - 9000:9000
+    depends_on:
+      - auth-db
+    restart: always
+    command: start-dev
 
   ingress-proxy:
     build:
       context: ../infrastructure/envoy/
+      args:
+        ENVOY_VARIANT: contrib-dev
     depends_on:
       todo-proxy:
         condition: service_healthy
     ports:
     - "8080:8080"
     - "8001:8001"
+    - "5432:5432"
 
   todo-proxy:
     build:
