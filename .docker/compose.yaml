@@ -41,6 +41,8 @@ services:
     networks:
       - todo-api
       - default
+    volumes:
+      - ../certs:/certs
     depends_on:
       todo-api:
         condition: service_healthy

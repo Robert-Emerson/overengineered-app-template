@@ -26,6 +26,24 @@ static_resources:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+          transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: /certs/downstream_localhost.crt
+                    private_key:
+                      filename: /certs/downstream_localhost.key
+                validation_context:
+                  trusted_ca:
+                    filename: /certs/downstream_localhost.crt
+                  trust_chain_verification: ACCEPT_UNTRUSTED
+                  match_typed_subject_alt_names:
+                    - san_type: DNS
+                      matcher:
+                        exact: api.localhost
 
   clusters:
     - name: todo-service

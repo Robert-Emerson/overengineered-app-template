@@ -36,6 +36,16 @@ static_resources:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+          transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: /certs/downstream_localhost.crt
+                    private_key:
+                      filename: /certs/downstream_localhost.key
 
     - name: postgres
       address:
@@ -54,6 +64,16 @@ static_resources:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
                 stat_prefix: postgres_tcp
                 cluster: auth-db
+          transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: /certs/downstream_localhost.crt
+                    private_key:
+                      filename: /certs/downstream_localhost.key
 
   clusters:
     - name: todoservice-envoy
@@ -68,6 +88,16 @@ static_resources:
                     socket_address:
                       address: todo-proxy
                       port_value: 8000
+      transport_socket:
+        name: envoy.transport_sockets.tls
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+          common_tls_context:
+            tls_certificates:
+              - certificate_chain:
+                  filename: /certs/upstream_localhost.crt
+                private_key:
+                  filename: /certs/upstream_localhost.key
 
     - name: auth-db
       type: STRICT_DNS
