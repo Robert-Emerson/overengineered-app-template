@@ -1,17 +1,21 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /source
+
+# Install NativeAOT build prerequisites
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    clang zlib1g-dev
 
 # Copy everything
 COPY . ./
 
-RUN dotnet restore Api/Api.csproj
+RUN dotnet restore Api/Api.csproj --runtime linux-arm64
 # Build and publish a release
-ARG ASPNETCORE_ENVIRONMENT="Development"
-ENV ASPNETCORE_ENVIRONMENT="$ASPNETCORE_ENVIRONMENT"
-RUN dotnet publish Api/Api.csproj --output /app --no-restore --configuration "${ASPNETCORE_ENVIRONMENT}"
+RUN dotnet publish Api/Api.csproj --output /app --no-restore --configuration Release --runtime linux-arm64
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine AS release
+FROM mcr.microsoft.com/dotnet/runtime-deps:9.0 AS release
 EXPOSE 8080
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["dotnet", "Api.dll"]
+RUN apt-get -yq update && apt-get -yq install wget
+ENTRYPOINT ["/app/Api"]

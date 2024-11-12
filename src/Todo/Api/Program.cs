@@ -10,6 +10,8 @@ builder.Services
         {
             options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
         })
+    .AddOpenApi()
+    .AddProblemDetails()
     .AddHealthChecks();
 
 builder.Services.AddOpenTelemetry()
@@ -18,6 +20,8 @@ builder.Services.AddOpenTelemetry()
             .AddConsoleExporter());
 
 var app = builder.Build();
+
+app.MapOpenApi();
 
 var sampleTodos = new Todo[] {
     new(1, "Walk the dog"),
@@ -28,7 +32,6 @@ var sampleTodos = new Todo[] {
 };
 
 var todosApi = app.MapGroup("/todos");
-
 todosApi.MapHealthChecks("/health");
 todosApi.MapGet("/", () => sampleTodos);
 todosApi.MapGet("/{id:int}", (int id) =>

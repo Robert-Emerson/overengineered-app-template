@@ -23,8 +23,6 @@ services:
       watch:
         - action: rebuild
           path: ../src/Todo
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
     networks:
       - todo-api
     healthcheck:
