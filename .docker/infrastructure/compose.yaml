@@ -34,12 +34,6 @@ services:
       KC_METRICS_ENABLED: true
       KC_HOSTNAME: auth.localhost
       KC_HOSTNAME_PORT: 9090
-      DB_VENDOR: postgres
-      DB_ADDR: auth-db
-      DB_DATABASE: keycloak
-      DB_USER: ${KC_DB_LOGIN}
-      DB_PASSWORD: ${KC_DB_PASSWORD}
-      DB_SCHEMA: keycloak
       KEYCLOAK_ADMIN: ${KC_ADMIN_LOGIN}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
       KEYCLOAK_USER: ${KC_USER_LOGIN}
@@ -48,13 +42,18 @@ services:
       KC_DB_URL: jdbc:postgresql://auth-db/keycloak
       KC_DB_USERNAME: ${KC_DB_LOGIN}
       KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HTTPS_CERTIFICATE_FILE: /certs/external.pem
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /certs/external.key
     ports:
-      - 9090:8080
+      - 9090:8443
       - 9000:9000
+    volumes:
+      - ../../certs/external_localhost.pem:/certs/external.pem
+      - ../../certs/external_localhost.key:/certs/external.key
     depends_on:
       - auth-db
     restart: always
-    command: start-dev
+    command: start
 
   ingress-proxy:
     build:

@@ -33,12 +33,12 @@ static_resources:
               common_tls_context:
                 tls_certificates:
                   - certificate_chain:
-                      filename: /certs/downstream_localhost.crt
+                      filename: /certs/upstream_localhost.pem
                     private_key:
-                      filename: /certs/downstream_localhost.key
+                      filename: /certs/upstream_localhost.key
                 validation_context:
                   trusted_ca:
-                    filename: /certs/downstream_localhost.crt
+                    filename: /certs/upstream_localhost.pem
                   trust_chain_verification: ACCEPT_UNTRUSTED
                   match_typed_subject_alt_names:
                     - san_type: DNS
