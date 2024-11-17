@@ -1,14 +1,21 @@
-@Api_HostAddress = http://api.localhost:8080
+# API requests for the the Todo application
+# Uses the REST Client syntax for execution in VS Code
 
-GET {{Api_HostAddress}}/todos/health
-Accept: application/json
+@Api_HostAddress = https://api.localhost:8080
 
 ###
+# @prompt authToken
+GET {{Api_HostAddress}}/todos/health
+Accept: application/json
+Authentication: authToken
+
+###
+# @prompt authToken
 GET {{Api_HostAddress}}/todos/
 Accept: application/json
 
 ###
-
+# @prompt authToken
 GET {{Api_HostAddress}}/todos/1
 Accept: application/json
 
