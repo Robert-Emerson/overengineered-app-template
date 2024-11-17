@@ -31,8 +31,29 @@ static_resources:
                             prefix: "/"
                           route:
                             cluster: auth
-
                 http_filters:
+                  - name: envoy.filters.http.jwt_auth
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                      providers:
+                        auth-todo:
+                          issuer: https://auth.localhost:9090/realms/test-realm
+                          remote_jwks:
+                            http_uri:
+                              uri: https://auth:8443/realms/test-realm/protocol/openid-connect/certs
+                              cluster: auth
+                              timeout: 1s
+                      rules:
+                        - match:
+                            path_match_policy:
+                              name: health-match
+                              typed_config:
+                                "@type": type.googleapis.com/envoy.extensions.path.match.uri_template.v3.UriTemplateMatchConfig
+                                path_template: "/*/health"
+                        - match:
+                            prefix: "/todos"
+                          requires:
+                            provider_name: auth-todo
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -111,7 +132,7 @@ static_resources:
                   address:
                     socket_address:
                       address: auth
-                      port_value: 8080
+                      port_value: 8443
 
 admin:
   address:

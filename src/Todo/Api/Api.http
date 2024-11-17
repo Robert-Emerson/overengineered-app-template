@@ -4,7 +4,6 @@
 @Api_HostAddress = https://api.localhost:8080
 
 ###
-# @prompt authToken
 GET {{Api_HostAddress}}/todos/health
 Accept: application/json
 Authentication: authToken
@@ -13,10 +12,12 @@ Authentication: authToken
 # @prompt authToken
 GET {{Api_HostAddress}}/todos/
 Accept: application/json
+Authorization: Bearer {{authToken}}
 
 ###
 # @prompt authToken
 GET {{Api_HostAddress}}/todos/1
 Accept: application/json
+Authorization: Bearer {{authToken}}
 
 ###

@@ -23,11 +23,15 @@ Template for a modern, over-engineered web app that uses containers and service 
 ## What's next
 
 1. JWT Auth for API
-   1. API JWT validation
-2. Parameterize `todo-proxy.yaml` > `api-proxy.yaml`
-3. Logging
+   1. continue API JWT validation
+      1. get JWKS remote fetch working
+      1. where should JWT config actually live? overall, or service level? feels very service level-y, but really don't like un-auth'd requests coming in
+   1. Move Keycloak behind Envoy
+   1. import keycloak realm (tbd)
+2. Logging
    1. OTel in API
    2. Apache Skywalking? or maybe Jaeger/Prometheus/Grafana
+3. Parameterize/templatize `todo-proxy.yaml` > `api-proxy.yaml`
 4. Unit & Integration Tests
 5. Database
 6. SPA
