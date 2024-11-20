@@ -45,7 +45,6 @@ services:
       KC_HTTPS_CERTIFICATE_FILE: /certs/external.pem
       KC_HTTPS_CERTIFICATE_KEY_FILE: /certs/external.key
     ports:
-      - 9090:8443
       - 9000:9000
     volumes:
       - ../../certs/external_localhost.pem:/certs/external.pem
