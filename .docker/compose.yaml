@@ -28,7 +28,8 @@ services:
     healthcheck:
       test: wget -O/dev/null http://localhost:8080/todos/health || exit 1
       timeout: 3s
-      start_period: 15s
+      start_period: 5s
+      start_interval: 1s
 
   todo-proxy:
     build:

@@ -1,5 +1,5 @@
 
-@Auth_HostAddress = https://auth.localhost:9090
+@Auth_HostAddress = https://auth.localhost:8080
 @username = {{$dotenv KC_USER_LOGIN}}
 @password = {{$dotenv KC_USER_PASSWORD}}
 
