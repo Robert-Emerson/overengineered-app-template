@@ -2,8 +2,45 @@ name: microservice-chassis-infrastructure
 
 volumes:
   pgdata:
+  promdata:
 
 services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    ports:
+      - 13133:13133 # health_check extension
+    volumes:
+      - ../../infrastructure/monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+  
+  tracing:
+    image: jaegertracing/jaeger
+    volumes:
+      - ../../infrastructure/monitoring/jaeger.yaml:/jaeger/config.yaml
+
+  prometheus:
+    image: prom/prometheus
+    build:
+      context: ../../infrastructure/monitoring/prometheus
+    volumes:
+      - promdata:/prometheus
+      - ../../infrastructure/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    healthcheck:
+      test: wget -O/dev/null http://localhost:9090/-/health || exit 1
+      timeout: 5s
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - ../../infrastructure/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../../infrastructure/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    healthcheck:
+      test: wget -q -O /dev/null http://localhost:3000/api/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      - prometheus
+
   auth-db:
     image: postgres
     restart: always
@@ -15,7 +52,7 @@ services:
       KC_DB_LOGIN: /run/secrets/kc_db_login
       KC_DB_PASSWORD: /run/secrets/kc_db_password
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: pg_isready
       interval: 1s
       timeout: 5s
       retries: 10
@@ -60,8 +97,10 @@ services:
       args:
         ENVOY_VARIANT: contrib-dev
     ports:
-      - "8080:8080"
-      - "8001:8001"
-      - "5432:5432"
+      - "8080:8080" # api
+      - "8001:8001" # envoy admin
+      - "5432:5432" # Postgres
+      - "16686:16686" # Jaeger
+      - "3000:3000" # Grafana
     volumes:
       - ../../certs:/certs
