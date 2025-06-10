@@ -10,7 +10,11 @@ processors:
 
 exporters:
   otlp:
-    endpoint: otel-collector:4317
+    endpoint: tracing:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: prometheus:8888
 
 extensions:
   health_check:

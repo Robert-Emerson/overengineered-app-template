@@ -31,13 +31,29 @@ static_resources:
                             prefix: "/"
                           route:
                             cluster: auth
+                    - name: dashboards
+                      domains:
+                        - "dashboards.*"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: grafana
+                    - name: tracing
+                      domains:
+                        - "tracing.*"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: tracing
                 http_filters:
                   - name: envoy.filters.http.jwt_auth
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
                       providers:
                         auth-todo:
-                          issuer: https://auth.localhost:9090/realms/test-realm
+                          issuer: https://auth.localhost:8080/realms/test-realm
                           remote_jwks:
                             http_uri:
                               uri: https://auth:8443/realms/test-realm/protocol/openid-connect/certs
@@ -138,6 +154,30 @@ static_resources:
         typed_config:
           "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
           sni: auth
+
+    - name: grafana
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: grafana
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: grafana
+                      port_value: 3000
+
+    - name: tracing
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: tracing
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: tracing
+                      port_value: 16686
 
 admin:
   address:

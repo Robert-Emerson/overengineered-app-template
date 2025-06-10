@@ -15,9 +15,7 @@ builder.Services
     .AddHealthChecks();
 
 builder.Services.AddOpenTelemetry()
-        .WithTracing(builder => builder
-            .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter());
+    .WithTracing(builder => builder.AddAspNetCoreInstrumentation().AddConsoleExporter());
 
 var app = builder.Build();
 

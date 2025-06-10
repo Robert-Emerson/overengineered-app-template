@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get -qq update -y \
     && apt-get -qq install --no-install-recommends -y curl
 COPY --chmod=777 "$ENVOY_CONFIG" /etc/envoy.yaml
-CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml"]
+CMD ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "debug"]
 
 FROM envoy-base AS envoy-admin
 ENV ENVOY_ADMIN_PORT=8001
