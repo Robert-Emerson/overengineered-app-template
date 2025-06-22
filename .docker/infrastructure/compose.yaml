@@ -90,13 +90,21 @@ services:
     command: start
 
   ingress-proxy:
-    build:
-      context: ../../infrastructure/envoy/
-      args:
-        ENVOY_VARIANT: contrib-dev
+    image: envoyproxy/envoy:contrib-dev
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+      - ENVOY_ADMIN_PORT=8001
     ports:
       - "8080:8080" # api
       - "8001:8001" # envoy admin
       - "5432:5432" # Postgres
     volumes:
       - ../../certs:/certs
+      - ../../infrastructure/envoy/envoy.yaml:/etc/envoy.yaml
+    healthcheck:
+      test: wget -q -O /dev/null http://localhost:8001/ready || exit 1
+      interval: 5s
+      timeout: 1s
+      retries: 3
+      start_period: 5s
+    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "warn"]
