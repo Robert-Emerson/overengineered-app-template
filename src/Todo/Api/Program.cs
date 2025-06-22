@@ -14,8 +14,22 @@ builder.Services
     .AddProblemDetails()
     .AddHealthChecks();
 
+var oltpCollectorEndpoint = builder.Configuration["OLTP_COLLECTOR_ENDPOINT"];
 builder.Services.AddOpenTelemetry()
-    .WithTracing(builder => builder.AddAspNetCoreInstrumentation().AddConsoleExporter());
+    .WithTracing(traceBuilder =>
+    {
+        traceBuilder.AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+        if (oltpCollectorEndpoint is not null)
+            traceBuilder.AddOtlpExporter(otlpOptions =>
+                     {
+                         otlpOptions.Endpoint = new Uri(oltpCollectorEndpoint);
+                         // TODO - setting the protocol to HTTP Protobuf for OTLP as proxy isn't set up for gRPC (yet)
+                         otlpOptions.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                     });
+        else
+            traceBuilder.AddConsoleExporter();
+    });
 
 var app = builder.Build();
 

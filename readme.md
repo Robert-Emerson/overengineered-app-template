@@ -6,7 +6,7 @@ Template for a modern, over-engineered web app that uses containers and service 
 
 - Docker runtime (Docker Desktop, Rancher Desktop)
 - Make
-- .NET 8 (nice to have; container is set up to build for you)
+- .NET 9 (nice to have; container is set up to build for you)
 
 ## Running
 

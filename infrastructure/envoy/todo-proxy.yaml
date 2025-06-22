@@ -16,12 +16,20 @@ static_resources:
                   virtual_hosts:
                     - name: backend
                       domains:
-                        - "*"
+                        - "api.*"
                       routes:
                         - match:
                             prefix: "/todos"
                           route:
                             cluster: todo-service
+                    - name: otel-collector
+                      domains:
+                        - "otel-collector.*"
+                      routes:
+                        - match:
+                            prefix: "/"
+                          route:
+                            cluster: otel-collector
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
@@ -58,6 +66,18 @@ static_resources:
                     socket_address:
                       address: todo-api
                       port_value: 8080
+    - name: otel-collector
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: otel-collector
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: otel-collector
+                      port_value: 4318
 admin:
   address:
     socket_address:
