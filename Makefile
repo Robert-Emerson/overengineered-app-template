@@ -15,6 +15,7 @@ down:
 
 clean:
 	docker-compose --file .docker/compose.yaml down --rmi local
+	docker volume prune
 
 certs: | certdir
 	openssl req -x509 -newkey rsa:4096 -sha256 -days 365 \

@@ -34,18 +34,14 @@ services:
   todo-proxy:
     image: envoyproxy/envoy:contrib-dev
     networks:
-      - todo-api
-      - default
+      todo-api:
+          aliases:
+            - otel-collector.todo-proxy
+      default:
     volumes:
       - ../certs:/certs
       - ../infrastructure/envoy/todo-proxy.yaml:/etc/envoy.yaml
-    healthcheck:
-      test: wget -q -O /dev/null http://localhost:8001/ready || exit 1
-      interval: 30s
-      timeout: 1s
-      retries: 3
-      start_period: 5s
     depends_on:
       todo-api:
         condition: service_healthy
-    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "warn"]
+    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "debug"]

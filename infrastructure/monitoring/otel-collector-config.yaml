@@ -15,6 +15,8 @@ exporters:
       insecure: true
   prometheus:
     endpoint: prometheus:8888
+  debug:
+    verbosity: detailed
 
 extensions:
   health_check:
@@ -26,15 +28,11 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
+      exporters: [otlp, debug]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
+      exporters: [otlp, debug]
   telemetry:
     metrics:
       readers:
