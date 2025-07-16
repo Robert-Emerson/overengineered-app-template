@@ -12,6 +12,16 @@ static_resources:
                 "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
                 codec_type: AUTO
                 stat_prefix: ingress_http
+                tracing:
+                  spawn_upstream_span: true
+                  provider:
+                    name: envoy.tracers.opentelemetry
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.config.trace.v3.OpenTelemetryConfig
+                      grpc_service:
+                        envoy_grpc:
+                          cluster_name: otel-collector
+                      service_name: envoy-gateway
                 route_config:
                   name: local_route
                   virtual_hosts:
@@ -178,6 +188,20 @@ static_resources:
                     socket_address:
                       address: tracing
                       port_value: 16686
+
+    - name: otel-collector
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      http2_protocol_options: {}
+      load_assignment:
+        cluster_name: otel-collector
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address:
+                      address: otel-collector
+                      port_value: 4317
 
 admin:
   address:
