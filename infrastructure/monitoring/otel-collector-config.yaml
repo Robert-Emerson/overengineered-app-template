@@ -14,9 +14,7 @@ exporters:
     tls:
       insecure: true
   prometheus:
-    endpoint: prometheus:8888
-  debug:
-    verbosity: detailed
+    endpoint: localhost:8889 # publish collected metrics on this port
 
 extensions:
   health_check:
@@ -28,16 +26,16 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlp]
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, debug]
+      exporters: [otlp, prometheus]
   telemetry:
     metrics:
       readers:
         - pull:
             exporter:
               prometheus:
-                host: "0.0.0.0"
+                host: localhost
                 port: 8888

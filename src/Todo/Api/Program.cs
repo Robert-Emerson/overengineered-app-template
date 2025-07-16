@@ -2,6 +2,7 @@ using App.Api;
 using App.Domain.Entity;
 
 using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateSlimBuilder(args);
@@ -17,6 +18,12 @@ builder.Services
 
 builder.Services
     .AddOpenTelemetry()
+    .WithMetrics(metricsBuilder =>
+    {
+        metricsBuilder
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+    })
     .WithTracing(traceBuilder =>
     {
         traceBuilder

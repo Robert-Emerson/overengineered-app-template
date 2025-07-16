@@ -44,4 +44,4 @@ services:
     depends_on:
       todo-api:
         condition: service_healthy
-    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "debug"]
+    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "warn"]
