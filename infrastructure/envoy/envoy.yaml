@@ -94,23 +94,23 @@ static_resources:
                     private_key:
                       filename: /certs/external_localhost.key
 
-    - name: postgres
-      address:
-        socket_address:
-          protocol: TCP
-          address: 0.0.0.0
-          port_value: 5432
-      filter_chains:
-        - filters:
-            - name: envoy.filters.network.postgres_proxy
-              typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy
-                stat_prefix: egress_postgres
-            - name: envoy.filters.network.tcp_proxy
-              typed_config:
-                "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
-                stat_prefix: postgres_tcp
-                cluster: auth-db
+    # - name: postgres
+    #   address:
+    #     socket_address:
+    #       protocol: TCP
+    #       address: 0.0.0.0
+    #       port_value: 5432
+    #   filter_chains:
+    #     - filters:
+    #         - name: envoy.filters.network.postgres_proxy
+    #           typed_config:
+    #             "@type": type.googleapis.com/envoy.extensions.filters.network.postgres_proxy.v3alpha.PostgresProxy
+    #             stat_prefix: egress_postgres
+    #         - name: envoy.filters.network.tcp_proxy
+    #           typed_config:
+    #             "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+    #             stat_prefix: postgres_tcp
+    #             cluster: auth-db
 
   clusters:
     - name: todoservice-envoy

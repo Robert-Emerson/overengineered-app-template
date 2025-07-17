@@ -7,8 +7,6 @@ volumes:
 services:
   otel-collector:
     image: otel/opentelemetry-collector-contrib
-    ports:
-      - 13133:13133 # health_check extension
     volumes:
       - ../../infrastructure/monitoring/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
   
@@ -95,7 +93,6 @@ services:
     ports:
       - "8080:8080" # api
       - "8001:8001" # envoy admin
-      - "5432:5432" # Postgres
     volumes:
       - ../../certs:/certs
       - ../../infrastructure/envoy/envoy.yaml:/etc/envoy.yaml
