@@ -8,6 +8,7 @@ using OpenTelemetry.Trace;
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services
+    .AddLogging()
     .ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
@@ -46,7 +47,7 @@ var sampleTodos = new Todo[] {
 
 var todosApi = app.MapGroup("/todos");
 todosApi.MapHealthChecks("/health");
-todosApi.MapGet("/", () => sampleTodos);
+todosApi.MapGet("/", (ILogger<Todo> logger) => { logger.LogInformation("sample log entry"); return sampleTodos; });
 todosApi.MapGet("/{id:int}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)
