@@ -2,4 +2,4 @@
 certs/*
 
 # Ignore VS/VSCode generated solution files
-**/*.generated.sln
+**/*.sln

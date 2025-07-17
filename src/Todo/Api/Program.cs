@@ -1,11 +1,14 @@
 using App.Api;
 using App.Domain.Entity;
 
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateSlimBuilder(args);
 
 builder.Services
+    .AddLogging()
     .ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
@@ -14,10 +17,21 @@ builder.Services
     .AddProblemDetails()
     .AddHealthChecks();
 
-builder.Services.AddOpenTelemetry()
-        .WithTracing(builder => builder
+builder.Services
+    .AddOpenTelemetry()
+    .WithMetrics(metricsBuilder =>
+    {
+        metricsBuilder
             .AddAspNetCoreInstrumentation()
-            .AddConsoleExporter());
+            .AddHttpClientInstrumentation();
+    })
+    .WithTracing(traceBuilder =>
+    {
+        traceBuilder
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+    })
+    .UseOtlpExporter();
 
 var app = builder.Build();
 
@@ -33,7 +47,7 @@ var sampleTodos = new Todo[] {
 
 var todosApi = app.MapGroup("/todos");
 todosApi.MapHealthChecks("/health");
-todosApi.MapGet("/", () => sampleTodos);
+todosApi.MapGet("/", (ILogger<Todo> logger) => { logger.LogInformation("sample log entry"); return sampleTodos; });
 todosApi.MapGet("/{id:int}", (int id) =>
     sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
         ? Results.Ok(todo)

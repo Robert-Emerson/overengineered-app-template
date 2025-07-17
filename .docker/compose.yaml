@@ -32,16 +32,16 @@ services:
       start_interval: 1s
 
   todo-proxy:
-    build:
-      context: ../infrastructure/envoy/
-      target: envoy-admin
-      args:
-        ENVOY_CONFIG: ./todo-proxy.yaml
+    image: envoyproxy/envoy:contrib-dev
     networks:
-      - todo-api
-      - default
+      todo-api:
+          aliases:
+            - otel-collector.todo-proxy
+      default:
     volumes:
       - ../certs:/certs
+      - ../infrastructure/envoy/todo-proxy.yaml:/etc/envoy.yaml
     depends_on:
       todo-api:
         condition: service_healthy
+    command: ["/usr/local/bin/envoy", "-c", "/etc/envoy.yaml", "--log-level", "warn"]
